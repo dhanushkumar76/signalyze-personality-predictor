@@ -1,5 +1,6 @@
 streamlit==1.35.0
-tensorflow==2.15.0
+tensorflow==2.16.0
+keras==3.0.0
 pandas==2.2.2
 numpy==1.26.4
 scikit-learn==1.4.2
@@ -8,7 +9,6 @@ matplotlib==3.8.4
 Pillow==10.3.0
 tqdm==4.66.4
 seaborn==0.13.2
-gdown==5.1.0 # If you're fetching from Google Drive
-python-multipart==0.0.9 # If you plan to handle form data uploads
-tensorflow==2.16 
-keras==3.0.0
+gdown==5.1.0
+python-multipart==0.0.9
+plotly==5.17.0
