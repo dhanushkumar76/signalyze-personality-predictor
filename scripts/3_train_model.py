@@ -15,6 +15,14 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.optimizers.schedules import CosineDecayRestarts
 from tensorflow.keras.mixed_precision import set_global_policy
 
+# Add parent directory to path to import custom objects
+import sys
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+from utils.custom_objects import (
+    weighted_loss_trait_1, weighted_loss_trait_2, weighted_loss_trait_3, weighted_loss_trait_4,
+    weighted_loss_trait_5, weighted_loss_trait_6, weighted_loss_trait_7, weighted_loss_trait_8
+)
+
 # Enable mixed precision for faster training
 set_global_policy("mixed_float16")
 
@@ -143,29 +151,16 @@ class MultiInputGenerator(Sequence):
 train_gen = MultiInputGenerator(X_train, Y_train, y_train)
 val_gen = MultiInputGenerator(X_val, Y_val, y_val, shuffle=False)
 
-# === Dynamic Loss Weighting ===
-trait_weights = {f"trait_{i+1}": tf.Variable(1.0, trainable=False, dtype=tf.float32) for i in range(NUM_TRAITS)}
-
-def focal_loss(gamma=2.0, alpha=0.25):
-    """Focal loss for handling difficult traits"""
-    def loss(y_true, y_pred):
-        y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0)
-        ce = -y_true * tf.math.log(y_pred)
-        weight = alpha * tf.pow(1 - y_pred, gamma)
-        return tf.reduce_sum(weight * ce, axis=1)
-    return loss
-
-def make_weighted_loss(key, base_loss):
-    """Create weighted loss function"""
-    def loss(y_true, y_pred): 
-        return trait_weights[key] * base_loss(y_true, y_pred)
-    return loss
-
-# Define loss functions (focal loss for difficult traits)
+# === Define loss functions using registered custom objects ===
 loss_map = {
-    f"trait_{i+1}": make_weighted_loss(
-        f"trait_{i+1}", focal_loss() if i in [2, 5, 6] else CategoricalCrossentropy()
-    ) for i in range(NUM_TRAITS)
+    "trait_1": weighted_loss_trait_1,
+    "trait_2": weighted_loss_trait_2,
+    "trait_3": weighted_loss_trait_3,
+    "trait_4": weighted_loss_trait_4,
+    "trait_5": weighted_loss_trait_5,
+    "trait_6": weighted_loss_trait_6,
+    "trait_7": weighted_loss_trait_7,
+    "trait_8": weighted_loss_trait_8,
 }
 
 # === Model Architecture ===
@@ -202,17 +197,17 @@ model = Model(inputs=[image_input, trait_input], outputs=outputs)
 
 # === Custom Callbacks ===
 class DynamicLossUpdater(Callback):
-    """Dynamically adjust loss weights based on validation performance"""
+    """Monitor validation performance - simplified without dynamic weights"""
     def __init__(self, baseline=0.55): 
         self.baseline = baseline
         
     def on_epoch_end(self, epoch, logs=None):
+        # Log performance for monitoring (weights are now fixed in loss functions)
         for i in range(NUM_TRAITS):
             key = f"trait_{i+1}"
             acc = logs.get(f"val_{key}_accuracy")
-            if acc is not None and not np.isnan(acc):
-                updated = tf.clip_by_value(1.0 + (self.baseline - acc) * 2, 0.6, 1.8)
-                trait_weights[key].assign(updated)
+            if acc is not None and not np.isnan(acc) and acc < self.baseline:
+                print(f"\n   Note: {key} validation accuracy ({acc:.3f}) below baseline ({self.baseline})")
 
 class UnfreezeBackbone(Callback):
     """Unfreeze EfficientNetB0 after initial training"""

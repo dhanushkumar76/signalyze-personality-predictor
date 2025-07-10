@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from PIL import Image
 from utils.logger import log_prediction
+from utils.custom_objects import CUSTOM_OBJECTS
 from sklearn.metrics import f1_score, accuracy_score, classification_report
 
 # === Paths ===
@@ -168,7 +169,7 @@ if uploaded_file:
     if os.path.exists(MODEL_PATH):
         try:
             with st.spinner("Loading model and making predictions..."):
-                model = load_model(MODEL_PATH)
+                model = load_model(MODEL_PATH, custom_objects=CUSTOM_OBJECTS)
                 
                 # Prepare image input
                 padded_rgb = np.stack([padded] * 3, axis=-1).astype(np.float32)
