@@ -35,12 +35,11 @@ Based on survey labels and psychological literature, the system predicts the fol
 
 1. Emotional Stability
 2. Dominance
-3. Sociability
-4. Self-Confidence
-5. Mental Energy
-6. Decision-Making Ability
-7. Personal Responsibility
-8. Thinking Pattern
+3. Self-Confidence
+4. Mental Energy
+5. Decision-Making Ability
+6. Personal Responsibility
+7. Thinking Pattern
 
 ---
 

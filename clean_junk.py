@@ -34,9 +34,22 @@ def delete_temp_files():
                 os.remove(f)
                 print(f"🗑️ Deleted temp/junk file: {f}")
 
+# 4. Remove all files except .keras, .csv, .py in model/ and logs/
+def clean_model_and_logs():
+    for folder in [os.path.join(ROOT, 'model'), os.path.join(ROOT, 'logs')]:
+        if os.path.exists(folder):
+            for f in os.listdir(folder):
+                if not (f.endswith('.keras') or f.endswith('.csv') or f.endswith('.py')):
+                    try:
+                        os.remove(os.path.join(folder, f))
+                        print(f"🗑️ Deleted: {os.path.join(folder, f)}")
+                    except Exception as e:
+                        print(f"Error deleting {f}: {e}")
+
 # Run cleanups (excludes training_log.csv and prediction_log.csv)
 delete_pycache_dirs()
 delete_generated_visuals()
 delete_temp_files()
+clean_model_and_logs()
 
 print("\n✅ Cleanup complete. Logs and model preserved.")

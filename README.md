@@ -28,7 +28,7 @@
 - **🔮 AI-Powered Predictions**: EfficientNetB0-based deep learning model
 - **📸 Image Processing**: Advanced preprocessing with CLAHE, deskewing, and normalization
 - **🎨 Visual Trait Extraction**: Automatic extraction of ink density, aspect ratio, and slant angle
-- **📊 Multi-Trait Analysis**: Predicts 8 personality dimensions simultaneously
+- **📊 Multi-Trait Analysis**: Predicts 4 personality dimensions simultaneously
 - **🌐 Web Interface**: User-friendly Streamlit application
 - **📈 Real-time Analytics**: Live model performance monitoring
 - **💾 Prediction Logging**: Automatic logging of all predictions for analysis
@@ -37,12 +37,8 @@
 
 1. **Confidence** - Self-assurance and assertiveness levels
 2. **Emotional Stability** - Resilience and emotional regulation
-3. **Sociability** - Social interaction preferences and openness
-4. **Responsiveness** - Reaction speed and adaptability
-5. **Concentration** - Focus and attention span capabilities
-6. **Introversion** - Energy source and social preferences
-7. **Creativity** - Innovation and artistic thinking patterns
-8. **Decision-Making** - Problem-solving approach and judgment style
+3. **Creativity** - Innovation and artistic thinking patterns
+4. **Decision-Making** - Problem-solving approach and judgment style
 
 ## 🏗️ Architecture
 
@@ -56,7 +52,7 @@ graph LR
     C --> E[Trait Fusion Layer]
     D --> E
     E --> F[Multi-Head Classification]
-    F --> G[8 Personality Predictions]
+    F --> G[4 Personality Predictions]
 ```
 
 ### 🧩 Model Components
@@ -205,10 +201,6 @@ signalyze-personality-predictor/
 Trait Performance:
 ├── Confidence:         Accuracy: 72%, F1: 0.68
 ├── Emotional Stability: Accuracy: 69%, F1: 0.65
-├── Sociability:        Accuracy: 71%, F1: 0.67
-├── Responsiveness:     Accuracy: 68%, F1: 0.64
-├── Concentration:      Accuracy: 70%, F1: 0.66
-├── Introversion:       Accuracy: 66%, F1: 0.62
 ├── Creativity:         Accuracy: 73%, F1: 0.69
 └── Decision-Making:    Accuracy: 67%, F1: 0.63
 ```
@@ -254,7 +246,7 @@ Edit the training script variables:
 # Training parameters
 IMAGE_SIZE = (128, 128)      # Input image dimensions
 BATCH_SIZE = 32              # Training batch size
-NUM_TRAITS = 8               # Number of personality traits
+NUM_TRAITS = 4               # Number of personality traits
 NUM_CLASSES = 3              # Likert scale classes (Disagree/Neutral/Agree)
 ```
 

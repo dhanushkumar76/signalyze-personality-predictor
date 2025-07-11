@@ -17,7 +17,7 @@ st.header("🧬 Trait Definitions")
 trait_info = {
     "Ink Density": "Proportion of inked pixels (dark areas) in the signature. A denser signature may indicate strong expression or assertiveness.",
     "Aspect Ratio": "The height-to-width ratio of the signature. Taller signatures may reflect ambition or confidence; wider ones may suggest openness.",
-    "Slant Angle": "The tilt of the signature letters. Right slant may indicate sociability; left slant may reflect reserved nature; no slant may suggest logical and balanced personality."
+    "Slant Angle": "The tilt of the signature letters. Right slant may indicate expressiveness or openness; left slant may reflect reserved nature; no slant may suggest logical and balanced personality."
 }
 
 for trait, explanation in trait_info.items():

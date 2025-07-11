@@ -11,8 +11,7 @@ import os
 # Configuration
 LOG_CSV = "logs/prediction_log.csv"  # Fixed path to match logger
 TRAIT_NAMES = [
-    "Confidence", "Emotional Stability", "Sociability", "Responsiveness",
-    "Concentration", "Introversion", "Creativity", "Decision-Making"
+    "Confidence", "Emotional Stability", "Creativity", "Decision-Making"
 ]
 
 st.set_page_config(page_title="📊 Prediction Analytics", layout="wide")
@@ -34,7 +33,7 @@ def load_prediction_data():
             return None
         
         # Convert timestamp
-        df['timestamp'] = pd.to_datetime(df['timestamp'])
+        df['timestamp'] = pd.to_datetime(df['timestamp'], errors='coerce')
         df = df.sort_values(by='timestamp', ascending=False)
         
         # Extract prediction results from trait columns
@@ -52,10 +51,14 @@ def load_prediction_data():
         return None
 
 # Load data
-df = load_prediction_data()
+try:
+    df = load_prediction_data()
+except Exception as e:
+    st.error(f"Error loading prediction data: {e}")
+    st.stop()
 
-if df is None:
-    st.info("ℹ️ No predictions logged yet.")
+if df is None or 'timestamp' not in df.columns:
+    st.info("ℹ️ No predictions logged yet or timestamp missing.")
     st.stop()
 
 # Sidebar controls
@@ -131,6 +134,19 @@ if analysis_type == "Overview":
             fig = px.pie(values=pred_counts.values, names=pred_counts.index, 
                         title="Distribution of All Personality Predictions")
             st.plotly_chart(fig, use_container_width=True)
+    
+    # Show trait metrics if available
+    METRICS_CSV = "model/metrics_report.csv"
+    if os.path.exists(METRICS_CSV):
+        st.subheader("📊 Trait-wise Evaluation Metrics")
+        metrics_df = pd.read_csv(METRICS_CSV)
+        st.dataframe(metrics_df, use_container_width=True)
+        import plotly.graph_objects as go
+        fig = go.Figure()
+        for metric in ['F1 Score', 'Precision', 'Recall', 'Accuracy']:
+            fig.add_trace(go.Bar(x=metrics_df['Trait'], y=metrics_df[metric], name=metric))
+        fig.update_layout(barmode='group', title="Trait-wise Evaluation Metrics", xaxis_title="Trait", yaxis_title="Score", legend_title="Metric", xaxis_tickangle=-45, height=500)
+        st.plotly_chart(fig, use_container_width=True)
 
 elif analysis_type == "Trait Analysis":
     st.header("🧠 Individual Trait Analysis")

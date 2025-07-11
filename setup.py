@@ -102,7 +102,7 @@ def create_sample_data():
     
     if not os.path.exists(sample_responses_path):
         # Create minimal sample CSV structure
-        sample_csv_content = """id,timestamp,Confidence,Emotional Stability,Sociability,Responsiveness,Concentration,Introversion,Creativity,Decision-Making
+        sample_csv_content = """id,timestamp,Confidence,Emotional Stability,Creativity,Decision-Making
 1,2024-01-01 10:00:00,Agree,Neutral,Agree,Disagree,Neutral,Agree,Strongly Agree,Neutral
 2,2024-01-01 11:00:00,Neutral,Agree,Disagree,Agree,Strongly Agree,Neutral,Agree,Disagree"""
         

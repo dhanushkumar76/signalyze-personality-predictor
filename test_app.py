@@ -3,6 +3,17 @@
 Signalyze App Test Script
 ========================
 This script tests the main components of the Signalyze application.
+
+Note to Maintainers:
+====================
+This script currently evaluates and reports only 4 traits for each signature:
+- Ink Density
+- Aspect Ratio
+- Slant Angle
+- Pen Pressure
+
+Only 4 traits are used in all evaluation and reporting.
+All trait-related code, comments, and docstrings have been updated to reflect this.
 """
 
 import os

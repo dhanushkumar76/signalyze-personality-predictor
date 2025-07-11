@@ -1,7 +1,11 @@
 # === scripts/evaluate_model.py ===
 """
-Comprehensive model evaluation script for Signalyze personality predictor.
-Generates detailed performance metrics, F1-scores, and accuracy analysis.
+Comprehensive model evaluation script for Signalyze personality predictor (4 traits version).
+Generates detailed performance metrics, F1-scores, and accuracy analysis for:
+- Confidence
+- Emotional Stability
+- Creativity
+- Decision-Making
 """
 
 import os
@@ -20,6 +24,8 @@ import tensorflow as tf
 from tensorflow.keras.models import load_model
 from tensorflow.keras.applications.efficientnet import preprocess_input
 from tensorflow.keras.utils import to_categorical
+from keras.saving import register_keras_serializable
+from tensorflow.keras.losses import CategoricalCrossentropy
 
 # Configuration
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -30,14 +36,37 @@ IMG_FOLDER = os.path.join(BASE_DIR, "data", "preprocessed_images")
 OUTPUT_DIR = os.path.join(BASE_DIR, "model", "evaluation_results")
 
 IMAGE_SIZE = (128, 128)
-NUM_TRAITS = 8
+NUM_TRAITS = 4  # Only 4 traits used in the current model
 NUM_CLASSES = 3
 LIKERT_MAP = {"Strongly Disagree": 0, "Disagree": 0, "Neutral": 1, "Agree": 2, "Strongly Agree": 2}
 TRAIT_NAMES = [
-    "Confidence", "Emotional Stability", "Sociability", "Responsiveness",
-    "Concentration", "Introversion", "Creativity", "Decision-Making"
+    "Confidence", "Emotional Stability", "Creativity", "Decision-Making",
 ]
 CLASS_NAMES = ["Disagree", "Neutral", "Agree"]
+
+# --- Custom loss functions for model loading ---
+@register_keras_serializable()
+def focal_loss_inner(y_true, y_pred, gamma=2.0, alpha=0.25):
+    y_pred = tf.clip_by_value(y_pred, 1e-7, 1.0)
+    ce = -y_true * tf.math.log(y_pred)
+    weight = alpha * tf.pow(1 - y_pred, gamma)
+    return tf.reduce_sum(weight * ce, axis=1)
+
+def make_registered_loss(trait_name, base_loss):
+    @register_keras_serializable(name=f"weighted_loss_{trait_name}")
+    def trait_loss(y_true, y_pred):
+        return base_loss(y_true, y_pred)
+    trait_loss.__name__ = f"weighted_loss_{trait_name}"
+    return trait_loss
+
+loss_map = {}
+for i in range(NUM_TRAITS):
+    trait_key = f"trait_{i+1}"
+    use_focal = i == 2  # Only 'Creativity' uses focal loss
+    base = focal_loss_inner if use_focal else CategoricalCrossentropy()
+    loss_map[trait_key] = make_registered_loss(trait_key, base)
+
+custom_objects = {f"weighted_loss_trait_{i+1}": loss_map[f"trait_{i+1}"] for i in range(NUM_TRAITS)}
 
 def load_test_data():
     """Load and preprocess test data"""
@@ -316,7 +345,7 @@ def main():
     try:
         # Load model
         print(f"🧠 Loading model from: {MODEL_PATH}")
-        model = load_model(MODEL_PATH)
+        model = load_model(MODEL_PATH, custom_objects=custom_objects)
         print("✅ Model loaded successfully")
         
         # Load test data
