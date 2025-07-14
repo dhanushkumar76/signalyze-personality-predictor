@@ -31,15 +31,12 @@ The core idea behind this project is that **a person’s handwriting and signatu
 
 ### 🧪 Traits Predicted
 
-Based on survey labels and psychological literature, the system predicts the following 8 traits:
+Based on survey labels and psychological literature, the system predicts the following 4 traits:
 
-1. Emotional Stability
-2. Dominance
-3. Self-Confidence
-4. Mental Energy
-5. Decision-Making Ability
-6. Personal Responsibility
-7. Thinking Pattern
+1. Confidence
+2. Emotional Stability
+3. Creativity
+4. Decision-Making Ability
 
 ---
 
