@@ -19,7 +19,7 @@ os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 df = pd.read_csv(CSV_PATH)
 
 print("🔽 Downloading first 12 form-submitted images...")
-for i in range(12):
+for i in range(69):
     try:
         img_url = df.loc[i, IMAGE_LINK_COLUMN]
 
