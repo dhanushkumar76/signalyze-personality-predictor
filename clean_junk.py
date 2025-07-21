@@ -1,55 +1,33 @@
 import os
-import glob
 import shutil
+from datetime import datetime
 
-# Root project folder
-ROOT = "D:/signalyze/signalyze-personality-predictor"
+# === Paths to clear ===
+training_log = "model/training_log.csv"
+metrics_report = "model/metrics_report.csv"
+eval_results_dir = "model/evaluation_results"
 
-# 1. Remove __pycache__ folders
-def delete_pycache_dirs():
-    for root, dirs, files in os.walk(ROOT):
-        for d in dirs:
-            if d == "__pycache__":
-                full_path = os.path.join(root, d)
-                shutil.rmtree(full_path)
-                print(f"🗑️ Deleted __pycache__: {full_path}")
+def safe_remove(file_path):
+    if os.path.exists(file_path):
+        os.remove(file_path)
+        print(f"✅ Removed: {file_path}")
 
-# 2. Remove loss curve and confusion matrices
-def delete_generated_visuals():
-    model_dir = os.path.join(ROOT, "model")
-    if os.path.exists(model_dir):
-        for f in glob.glob(os.path.join(model_dir, "loss_curve.png")):
-            os.remove(f)
-            print(f"🗑️ Deleted loss curve: {f}")
-        for f in glob.glob(os.path.join(model_dir, "conf_matrix_trait_*.png")):
-            os.remove(f)
-            print(f"🗑️ Deleted confusion matrix: {f}")
+def safe_clear_dir(folder_path):
+    if os.path.exists(folder_path):
+        for fname in os.listdir(folder_path):
+            fpath = os.path.join(folder_path, fname)
+            if fname.endswith(".png") or fname.endswith(".csv"):
+                os.remove(fpath)
+                print(f"✅ Cleared: {fpath}")
 
-# 3. Remove unnecessary OS/editor junk files
-def delete_temp_files():
-    patterns = ["*.tmp", "*.log~", "*.bak", "*.copy", ".DS_Store", "Thumbs.db"]
-    for root, dirs, files in os.walk(ROOT):
-        for pattern in patterns:
-            for f in glob.glob(os.path.join(root, pattern)):
-                os.remove(f)
-                print(f"🗑️ Deleted temp/junk file: {f}")
+def main():
+    print("🧹 Starting cleanup...")
 
-# 4. Remove all files except .keras, .csv, .py in model/ and logs/
-def clean_model_and_logs():
-    for folder in [os.path.join(ROOT, 'model'), os.path.join(ROOT, 'logs')]:
-        if os.path.exists(folder):
-            for f in os.listdir(folder):
-                if not (f.endswith('.keras') or f.endswith('.csv') or f.endswith('.py')):
-                    try:
-                        os.remove(os.path.join(folder, f))
-                        print(f"🗑️ Deleted: {os.path.join(folder, f)}")
-                    except Exception as e:
-                        print(f"Error deleting {f}: {e}")
+    safe_remove(training_log)
+    safe_remove(metrics_report)
+    safe_clear_dir(eval_results_dir)
 
-# Run cleanups (excludes training_log.csv and prediction_log.csv)
-delete_pycache_dirs()
-delete_generated_visuals()
-delete_temp_files()
-clean_model_and_logs()
+    print("✨ Logs cleared. Ready to retrain or evaluate!")
 
-print("\n✅ Cleanup complete. Logs and model preserved.")
+if __name__ == "__main__":
+    main()

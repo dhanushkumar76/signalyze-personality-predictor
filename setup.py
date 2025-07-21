@@ -15,11 +15,11 @@ def print_banner():
     """Print welcome banner"""
     banner = """
     ╔══════════════════════════════════════════════════════════════╗
-    ║                    🖋️  SIGNALYZE SETUP                       ║
-    ║              Signature-Based Personality Predictor           ║
-    ║                                                              ║
-    ║  This script will help you set up the complete environment  ║
-    ║  for running Signalyze on your system.                      ║
+    ║                    🖋️  SIGNALYZE SETUP                       ║
+    ║              Signature-Based Personality Predictor           ║
+    ║                                                              ║
+    ║    This script will help you set up the complete environment  ║
+    ║    for running Signalyze on your system.                      ║
     ╚══════════════════════════════════════════════════════════════╝
     """
     print(banner)
@@ -31,7 +31,7 @@ def check_python_version():
     
     if version.major < 3 or (version.major == 3 and version.minor < 10):
         print("❌ Python 3.10+ is required. Current version:", f"{version.major}.{version.minor}.{version.micro}")
-        print("   Please upgrade Python and try again.")
+        print("   Please upgrade Python and try again.")
         return False
     else:
         print(f"✅ Python {version.major}.{version.minor}.{version.micro} detected - Compatible!")
@@ -51,23 +51,20 @@ def create_directories():
     
     for directory in directories:
         Path(directory).mkdir(parents=True, exist_ok=True)
-        print(f"   ✅ Created: {directory}")
+        print(f"   ✅ Created: {directory}")
 
 def install_dependencies():
     """Install Python dependencies"""
     print("\n📦 Installing Python dependencies...")
     
     try:
-        # Upgrade pip first
         subprocess.check_call([sys.executable, "-m", "pip", "install", "--upgrade", "pip"])
-        
-        # Install requirements
         subprocess.check_call([sys.executable, "-m", "pip", "install", "-r", "requirements.txt"])
         print("✅ All dependencies installed successfully!")
         return True
     except subprocess.CalledProcessError as e:
         print(f"❌ Failed to install dependencies: {e}")
-        print("   Please check your internet connection and try again.")
+        print("   Please check your internet connection and try again.")
         return False
 
 def check_gpu_support():
@@ -77,48 +74,42 @@ def check_gpu_support():
     try:
         import tensorflow as tf
         
-        # Check for GPU
         gpus = tf.config.list_physical_devices('GPU')
         if gpus:
             print(f"✅ {len(gpus)} GPU(s) detected:")
             for i, gpu in enumerate(gpus):
-                print(f"   GPU {i}: {gpu.name}")
+                print(f"   GPU {i}: {gpu.name}")
         else:
-            print("⚠️  No GPU detected. Training will use CPU (slower).")
-            print("   For faster training, consider using Google Colab with GPU.")
+            print("⚠️  No GPU detected. Training will use CPU (slower).")
+            print("   For faster training, consider using Google Colab with GPU.")
         
-        # Check TensorFlow version
-        print(f"   TensorFlow version: {tf.__version__}")
+        print(f"   TensorFlow version: {tf.__version__}")
         
     except ImportError:
-        print("⚠️  Could not import TensorFlow. Dependencies may not be installed correctly.")
+        print("⚠️  Could not import TensorFlow. Dependencies may not be installed correctly.")
 
 def create_sample_data():
     """Create sample data files if they don't exist"""
     print("\n📊 Setting up sample data structure...")
     
-    sample_responses_path = "data/form_responses.csv"
-    sample_traits_path = "data/signature_traits.csv"
+    # FIX: Create a single, consistent master CSV
+    master_csv_path = "data/handwriting_personality_large_dataset.csv"
     
-    if not os.path.exists(sample_responses_path):
-        # Create minimal sample CSV structure
-        sample_csv_content = """id,timestamp,Confidence,Emotional Stability,Creativity,Decision-Making
-1,2024-01-01 10:00:00,Agree,Neutral,Agree,Disagree,Neutral,Agree,Strongly Agree,Neutral
-2,2024-01-01 11:00:00,Neutral,Agree,Disagree,Agree,Strongly Agree,Neutral,Agree,Disagree"""
+    if not os.path.exists(master_csv_path):
+        sample_csv_content = """Handwriting_Sample,Writing_Speed_wpm,Openness,Conscientiousness,Extraversion,Agreeableness,Neuroticism
+sample_1.jpg,60,0.35,0.40,0.72,0.45,0.25
+sample_2.jpg,32,0.73,0.05,0.35,0.52,0.66
+sample_3.jpg,10,0.83,0.16,0.16,0.81,0.68"""
         
-        with open(sample_responses_path, 'w') as f:
+        with open(master_csv_path, 'w') as f:
             f.write(sample_csv_content)
-        print(f"   ✅ Created sample: {sample_responses_path}")
+        print(f"   ✅ Created consistent sample: {master_csv_path}")
     
-    if not os.path.exists(sample_traits_path):
-        # Create minimal sample traits CSV
-        sample_traits_content = """id,ink_density,aspect_ratio,slant_angle
-1,0.1234,0.8765,15.23
-2,0.2345,1.1234,-8.45"""
-        
-        with open(sample_traits_path, 'w') as f:
-            f.write(sample_traits_content)
-        print(f"   ✅ Created sample: {sample_traits_path}")
+    # FIX: Remove creation of old CSV files
+    old_csv_path = "data/form_responses.csv"
+    if os.path.exists(old_csv_path):
+        os.remove(old_csv_path)
+        print(f"   ✅ Removed old file: {old_csv_path}")
 
 def print_next_steps():
     """Print instructions for next steps"""
@@ -128,23 +119,19 @@ def print_next_steps():
     
     📋 Next Steps:
     
-    1. 🚀 Run the Streamlit app:
-       streamlit run streamlit_app.py
+    1. 📥 Get your dataset: Download the Kaggle dataset and place the images in `data/all_images/`
     
-    2. 🌐 Open your browser to: http://localhost:8501
+    2. 📝 Run the preprocessing script:
+        python scripts/2_preprocess_all_images.py
     
-    3. 📸 Upload a signature image to test the system
+    3. 🖼️ Run the renaming script to align images with the CSV:
+        python scripts/rename_preprocessed_images.py
     
-    4. 🧠 To train your own model:
-       python scripts/3_train_model.py
+    4. 🧠 Start training your model with the new data:
+        python scripts/3_train_model.py
     
-    5. 📊 Evaluate model performance:
-       python scripts/evaluate_model.py
-    
-    ⚠️  Note: For training, you'll need:
-       - Real signature images in data/preprocessed_images/
-       - Corresponding survey responses in data/form_responses.csv
-       - Visual traits in data/signature_traits.csv
+    5. 🚀 Run the Streamlit app:
+        streamlit run streamlit_app.py
     
     📖 For detailed instructions, see README.md
     
@@ -156,26 +143,20 @@ def main():
     """Main setup function"""
     print_banner()
     
-    # Check prerequisites
     if not check_python_version():
         sys.exit(1)
     
-    # Create directories
     create_directories()
     
-    # Install dependencies
     if not install_dependencies():
         print("\n❌ Setup failed during dependency installation.")
-        print("   Please resolve the issues and run setup again.")
+        print("   Please resolve the issues and run setup again.")
         sys.exit(1)
     
-    # Check GPU support
     check_gpu_support()
     
-    # Create sample data
     create_sample_data()
     
-    # Print next steps
     print_next_steps()
     
     print("✅ Signalyze setup completed successfully!")

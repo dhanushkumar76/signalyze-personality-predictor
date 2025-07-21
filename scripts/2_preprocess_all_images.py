@@ -1,3 +1,5 @@
+# === scripts/2_preprocess_all_images.py ===
+
 import os
 import cv2
 import numpy as np
@@ -10,8 +12,10 @@ import matplotlib.pyplot as plt
 INPUT_FOLDER = r"D:\signalyze\signalyze-personality-predictor\data\all_images"
 OUTPUT_FOLDER = r"D:\signalyze\signalyze-personality-predictor\data\preprocessed_images"
 FEATURE_CSV = r"D:\signalyze\signalyze-personality-predictor\data\signature_traits.csv"
-TARGET_SIZE = (128, 128)
-DEBUG_SAMPLES = 6  # Show before-after images
+
+# FIX: Set TARGET_SIZE to match the model's input size (64, 64)
+TARGET_SIZE = (64, 64)
+DEBUG_SAMPLES = 6 
 
 os.makedirs(OUTPUT_FOLDER, exist_ok=True)
 
@@ -47,7 +51,6 @@ def compute_visual_traits(img):
     aspect_ratio = height / width if width != 0 else 1.0
     ink_density = np.sum(binary) / (img.shape[0] * img.shape[1])
 
-    # Slant using PCA
     x = coords - np.mean(coords, axis=0)
     cov = np.cov(x.T)
     eigvals, eigvecs = np.linalg.eig(cov)
@@ -137,7 +140,7 @@ pool.close()
 pool.join()
 
 # Save visual traits
-traits_df = pd.DataFrame(trait_records)
+traits_df = pd.DataFrame([r for r in results if r is not None])
 traits_df.to_csv(FEATURE_CSV, index=False)
 print(f"\n✅ Preprocessing done. Saved {len(traits_df)} images and traits to CSV:")
 print(f"📁 Images: {OUTPUT_FOLDER}\n📄 Traits CSV: {FEATURE_CSV}")

@@ -18,12 +18,9 @@ The core idea behind this project is that **a person’s handwriting and signatu
 1. **User Uploads Signature**: The user provides a handwritten signature image via the Streamlit web interface.
 2. **Preprocessing & Feature Extraction**:
    - The image is preprocessed (CLAHE, deskewing, resizing).
-   - Key visual traits are extracted like:
-     - Ink Density
-     - Aspect Ratio
-     - Slant Angle
+   - Key visual traits are extracted, such as ink density, aspect ratio, and slant angle.
 3. **Model Prediction**:
-   - These visual traits and the image are fed into a deep learning model trained to predict 8 psychological traits based on survey data.
+   - The preprocessed image is fed into a deep learning model trained to predict 5 psychological traits based on the new dataset.
 4. **Output**:
    - The model outputs Likert-scale predictions (Agree / Neutral / Disagree) for each personality trait.
 
@@ -31,12 +28,13 @@ The core idea behind this project is that **a person’s handwriting and signatu
 
 ### 🧪 Traits Predicted
 
-Based on survey labels and psychological literature, the system predicts the following 4 traits:
+Based on the dataset and psychological literature, the system predicts the following 5 traits from the Big Five Personality Model:
 
-1. Confidence
-2. Emotional Stability
-3. Creativity
-4. Decision-Making Ability
+1. Openness
+2. Conscientiousness
+3. Extraversion
+4. Agreeableness
+5. Neuroticism
 
 ---
 
@@ -46,7 +44,7 @@ Based on survey labels and psychological literature, the system predicts the fol
 - OpenCV for Image Preprocessing
 - Streamlit for Web Interface
 - Pandas, NumPy, Matplotlib for data processing & display
-- Custom CNN model trained on signature images + visual features
+- Custom CNN model trained on preprocessed signature images
 
 ---
 

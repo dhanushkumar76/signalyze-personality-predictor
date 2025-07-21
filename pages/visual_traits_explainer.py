@@ -7,8 +7,8 @@ from PIL import Image
 st.set_page_config(page_title="Visual Traits Explainer", layout="wide")
 st.title("📊 Visual Traits Explainer")
 st.markdown("""
-This section explains the key visual traits extracted from signature images.  
-These traits are used by our model to predict personality insights.
+This section explains the key visual traits that can be extracted from signature images.  
+These traits can be used by deep learning models to predict personality insights.
 """)
 
 # --- Trait Definitions ---
@@ -27,17 +27,20 @@ for trait, explanation in trait_info.items():
 # --- Visual Demos ---
 st.header("🔍 Visual Examples")
 
+# FIX: Use the correct TARGET_SIZE
+TARGET_SIZE = (64, 64)
+
 def create_demo_image(trait):
-    img = np.ones((128, 128), dtype=np.uint8) * 255
+    img = np.ones(TARGET_SIZE, dtype=np.uint8) * 255
 
     if trait == "Ink Density":
-        cv2.putText(img, "ThickSig", (10, 80), cv2.FONT_HERSHEY_SIMPLEX, 2.2, (0), 5)
+        cv2.putText(img, "Thick", (10, 40), cv2.FONT_HERSHEY_SIMPLEX, 1, (0), 2)
     elif trait == "Aspect Ratio":
-        cv2.putText(img, "Tall", (40, 100), cv2.FONT_HERSHEY_SIMPLEX, 2.2, (0), 3)
+        cv2.putText(img, "Tall", (20, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (0), 2)
     elif trait == "Slant Angle":
-        pts = np.array([[20, 30], [30, 80], [40, 30], [50, 80], [60, 30]], np.int32)
+        pts = np.array([[10, 15], [15, 30], [20, 15], [25, 30], [30, 15]], np.int32)
         pts = pts.reshape((-1, 1, 2))
-        cv2.polylines(img, [pts], False, (0), 5)
+        cv2.polylines(img, [pts], False, (0), 2)
 
     return img
 
@@ -58,18 +61,17 @@ if file:
 
     st.image(img, caption="Original Signature", use_column_width=True)
 
-    # Simple CLAHE and padding (no deskew for now)
     clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
     img = clahe.apply(img)
 
     h, w = img.shape
-    scale = min(128/h, 128/w)
+    scale = min(TARGET_SIZE[0]/h, TARGET_SIZE[1]/w)
     resized = cv2.resize(img, (int(w*scale), int(h*scale)), interpolation=cv2.INTER_AREA)
-    pad_v = (128 - resized.shape[0]) // 2
-    pad_h = (128 - resized.shape[1]) // 2
-    padded = cv2.copyMakeBorder(resized, pad_v, 128-resized.shape[0]-pad_v,
-                                pad_h, 128-resized.shape[1]-pad_h,
-                                borderType=cv2.BORDER_CONSTANT, value=255)
+    pad_v = (TARGET_SIZE[0] - resized.shape[0]) // 2
+    pad_h = (TARGET_SIZE[1] - resized.shape[1]) // 2
+    padded = cv2.copyMakeBorder(resized, pad_v, TARGET_SIZE[0]-resized.shape[0]-pad_v,
+                                 pad_h, TARGET_SIZE[1]-resized.shape[1]-pad_h,
+                                 borderType=cv2.BORDER_CONSTANT, value=255)
 
     st.image(padded, caption="Preprocessed", use_column_width=True)
 
@@ -80,7 +82,7 @@ if file:
         y, x = coords[:, 0], coords[:, 1]
         height = y.max() - y.min()
         width = x.max() - x.min()
-        ink_density = np.sum(binary) / (128 * 128)
+        ink_density = np.sum(binary) / (TARGET_SIZE[0] * TARGET_SIZE[1])
         aspect_ratio = height / width if width > 0 else 1.0
 
         centered = coords - np.mean(coords, axis=0)
@@ -96,4 +98,3 @@ if file:
     st.write(f"- **Ink Density**: {ink_density:.4f}")
     st.write(f"- **Aspect Ratio**: {aspect_ratio:.4f}")
     st.write(f"- **Slant Angle**: {slant:.2f}°")
-

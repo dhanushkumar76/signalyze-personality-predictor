@@ -6,10 +6,12 @@ import os
 st.set_page_config(page_title="Trait Metrics Dashboard", layout="centered")
 st.title("📊 Trait-wise Model Evaluation Metrics")
 
-METRICS_CSV = "model/metrics_report.csv"
+METRICS_CSV = "model/evaluation_results/metrics_report.csv"
+# FIX: Define TRAIT_NAMES to make the script's purpose explicit
+TRAIT_NAMES = ["Openness", "Conscientiousness", "Extraversion", "Agreeableness", "Neuroticism"]
 
 if not os.path.exists(METRICS_CSV):
-    st.warning("No metrics report found. Please train the model first.")
+    st.warning("No metrics report found. Please run evaluate_model.py first.")
     st.stop()
 
 metrics_df = pd.read_csv(METRICS_CSV)
@@ -41,6 +43,3 @@ st.plotly_chart(fig, use_container_width=True)
 
 st.markdown("---")
 st.info("This dashboard shows F1, Precision, Recall, and Accuracy for each trait as evaluated on the validation set after training.")
-
-# No explicit TRAIT_NAMES or NUM_TRAITS, but ensure dashboard expects only the four traits in metrics_report.csv
-# If any hardcoded references to 8 traits exist, update to 4.
