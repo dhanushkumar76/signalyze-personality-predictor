@@ -1,0 +1,4 @@
+model/model.keras filter=lfs diff=lfs merge=lfs -text
+model/bestmodel.keras filter=lfs diff=lfs merge=lfs -text
+model/*.keras filter=lfs diff=lfs merge=lfs -text
+*.h5 filter=lfs diff=lfs merge=lfs -text
